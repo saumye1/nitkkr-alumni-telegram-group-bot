@@ -1,0 +1,24 @@
+{
+  "name": "nitkkr-alumni-telegram-group-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saumye1/nitkkr-alumni-telegram-group-bot.git"
+  },
+  "author": "Saumye Malhotra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saumye1/nitkkr-alumni-telegram-group-bot/issues"
+  },
+  "homepage": "https://github.com/saumye1/nitkkr-alumni-telegram-group-bot#readme",
+  "dependencies": {
+    "config": "^3.0.1",
+    "request": "^2.88.0",
+    "telegraf": "^3.27.1"
+  }
+}

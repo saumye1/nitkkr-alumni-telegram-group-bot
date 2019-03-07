@@ -1,0 +1,10 @@
+{
+    "botToken" : "",
+    "databaseSettings" :{
+        "database" : "mongodb://localhost:27017/nitkkr-alumni",
+        "name" : "nitkkr-alumni"
+    },
+    "mongoCollections" : {
+        "users" : "tb_users"
+    }
+}
