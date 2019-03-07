@@ -1,4 +1,5 @@
 {
+    "botName" : "algoro_bot",
     "botToken" : "",
     "databaseSettings" :{
         "database" : "mongodb://localhost:27017/nitkkr-alumni",

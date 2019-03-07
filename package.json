@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/saumye1/nitkkr-alumni-telegram-group-bot#readme",
   "dependencies": {
-    "config": "^3.0.1",
-    "request": "^2.88.0",
-    "telegraf": "^3.27.1"
+    "config": "3.0.1",
+    "request": "2.88.0",
+    "telegraf": "3.27.1"
   }
 }
