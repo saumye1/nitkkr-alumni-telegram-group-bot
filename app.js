@@ -44,7 +44,7 @@ bot.on('new_chat_members', (ctx) => {
         membersFirstName += newMembers[i].first_name;
     }
     var message = "Dear " + membersFirstName
-    + ". Welcome to the NITK alumni group! It's a pleasure to have you here."
+    + ". Heartiest welcome to the NITK alumni group! It's a pleasure to have you here."
     + " Please introduce yourself to me, by clicking, @" + config.get('botName')
     + " And I shall further introduce you to everyone."
     ctx.reply(message);
@@ -77,8 +77,20 @@ bot.on('text', (ctx) => {
                     }
                 });
             })
-        } else {
-            ctx.reply("Please introduce yourself on a private chat with me, click @" + config.get('botName'));
+        } else if (textMsg.search('@' + config.get('botName')) >= 0) {
+            dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
+                if (textMsg.toLowerCase().search('introduceme') >= 0 && user 
+                && user.last_asked == constants.questions.length + 1) {
+                    var reply = "Meet " + user.from.first_name + " " + user.from.last_name + "\n";
+                    constants.questions.map(question => {
+                        reply += question.answer_key + " - " + user[question.answer_key] + "\n";
+                    })
+                    ctx.reply(reply);
+                } else {
+                    ctx.reply("Dear " + from.first_name 
+                    + ". Please introduce yourself on a private chat to @" + config.get('botName'));
+                }
+            })
         }
     }
 })
