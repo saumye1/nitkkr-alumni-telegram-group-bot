@@ -76,7 +76,7 @@ bot.on('text', (ctx) => {
                 //when this answer is to last question, redirect to alumni group and ask to introduce
                 updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
                     if (!result.nextQuestion) {
-                        ctx.reply("It's pleasure to know you! Please type /introduceMe@" 
+                        ctx.reply("It's pleasure to know you!\n\nPlease type /introduceMe@" 
                         + config.get('botName') + " in the NIT Kurkshetra Alumni group.");
                     } else {
                         var nextQuestion = result.nextQuestion;
@@ -91,7 +91,7 @@ bot.on('text', (ctx) => {
                     var reply = "Meet " + user.from.first_name + " " 
                     + (user.from.last_name ? user.from.last_name : "") + "\n";
                     constants.questions.map(question => {
-                        reply += "<strong>" + question.answer_key.toUpperCase() + "</strong> - " + user[question.answer_key] + "\n";
+                        reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
                     })
                     ctx.reply(reply);
                 } else {
@@ -148,4 +148,8 @@ function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
         console.log("Updating users in mongo::::::: error = ", error, " result = ", JSON.stringify(res.result));
         return cb(error, result);
     })
+}
+
+function capitalizeFirstLetter(str) {
+    return str.substring(0,1).toUpperCase() + str.substring(1, str.length);
 }
