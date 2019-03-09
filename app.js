@@ -2,12 +2,16 @@ var Telegraf    = require('telegraf');
 var config      = require('config');
 var MongoClient = require('mongodb').MongoClient;
 
+
 var bot = new Telegraf(config.get('botToken'));
 
-bot.start((ctx) => ctx.reply('Hi ' + ctx.message.from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.' 
-+ 'Which batch are you from?(YYYY fromat)'));
+bot.start((ctx) => {
+    ctx.reply('Dear ' + ctx.message.from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.' 
+    + 'Which batch are you from?(YYYY fromat)');
+    console.log("Message from = ", ctx.message.from);
+});
 
-bot.help((ctx) => ctx.reply('Hi am ' + config.get('botName') + ". I help introduce alumni of NIT Kurukshetra to each other"));
+bot.help((ctx) => ctx.reply('Hi am @' + config.get('botName') + ". I help introduce alumni of NIT Kurukshetra to each other"));
 
 bot.on('new_chat_members', (ctx) => {
     console.log("New chat members =>", ctx && ctx.message && ctx.message.new_chat_members);
@@ -19,8 +23,10 @@ bot.on('new_chat_members', (ctx) => {
         }
         membersFirstName += newMembers[i].first_name;
     }
-    var message = "Hi " + membersFirstName
-    + ". Welcome to the NITK alumni group! Please introduce yourself to me, by clicking, @" + config.get('botName')
+    var message = "Dear " + membersFirstName
+    + ". Welcome to the NITK alumni group! It's a pleasure to have you here."
+    + " Please introduce yourself to me, by clicking, @" + config.get('botName')
+    + " And I shall further introduce you to everyone."
     ctx.reply(message);
 })
 
