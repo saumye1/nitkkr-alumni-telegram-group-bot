@@ -11,8 +11,8 @@ bot.start((ctx) => {
     var from = message && message.from;
     var chat = message && message.chat;
     if (chat && chat.type == 'private') {
-        ctx.reply('Dear ' + from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.' 
-        + 'Which batch are you from(the year you took admission)?(YYYY format)');
+        ctx.reply('Dear ' + from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.\n\n' 
+        + '(1/5) Which batch are you from(the year you took admission)?(YYYY format)');
         console.log("Message from = ", ctx.message);
         var updateObj = {
             from : from,
@@ -145,7 +145,7 @@ function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
     delete(userObj['last_asked']);
     dbo.collection(config.get('mongoCollections.users')).updateOne({"from.id" : userObj.from.id },
     {$set : userObj, $inc: {last_asked :1}}, function(error, res) {
-        console.log("Updating users in mongo::::::: error = ", error, " result = ", JSON.stringify(res.result));
+        console.log("Updating users in mongo::::::: error = ", error, " result = ", JSON.stringify( (res && res.result) || {}));
         return cb(error, result);
     })
 }
