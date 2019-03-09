@@ -31,7 +31,7 @@ bot.start((ctx) => {
     }
 });
 
-bot.help((ctx) => ctx.reply('Hi am @' + config.get('botName') + ". I help introduce alumni of NIT Kurukshetra to each other"));
+bot.help((ctx) => ctx.reply('Hi! I am @' + config.get('botName') + ". I help introduce alumni of NIT Kurukshetra to each other"));
 
 bot.on('new_chat_members', (ctx) => {
     console.log("New chat members =>", ctx && ctx.message && ctx.message.new_chat_members);
@@ -59,7 +59,6 @@ bot.on('text', (ctx) => {
         var fromId = from.id;
 
         //have an array of questions, ask them in order
-        //and based NER or regex mark them answered,
         //ask next question from unanswered set
         if (messageRecieved.chat.type == 'private') {
             //reply only if private chat
@@ -79,16 +78,17 @@ bot.on('text', (ctx) => {
             })
         } else if (textMsg.search('@' + config.get('botName')) >= 0) {
             dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
-                if (textMsg.toLowerCase().search('introduceme') >= 0 && user 
+                if ( (textMsg.toLowerCase().search('introduceme') >= 0 || textMsg.toLowerCase().search('introduce me') >= 0) && user 
                 && user.last_asked == constants.questions.length + 1) {
-                    var reply = "Meet " + user.from.first_name + " " + user.from.last_name + "\n";
+                    var reply = "Meet " + user.from.first_name + " " 
+                    + (user.from.last_name ? user.from.last_name : "") + "\n";
                     constants.questions.map(question => {
                         reply += question.answer_key + " - " + user[question.answer_key] + "\n";
                     })
                     ctx.reply(reply);
                 } else {
                     ctx.reply("Dear " + from.first_name 
-                    + ". Please introduce yourself on a private chat to @" + config.get('botName'));
+                    + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName'));
                 }
             })
         }
