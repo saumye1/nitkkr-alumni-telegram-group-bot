@@ -50,13 +50,6 @@ bot.on('new_chat_members', (ctx) => {
     ctx.reply(message);
 })
 
-bot.command('introduceMe', (from, reply) => {
-    var entry = from.update && from.update.message;
-    var from = entry.from;
-
-    from.reply("Hey!!");
-})
-
 bot.on('text', (ctx) => {
     console.log("message =>", ctx.update.message);
     if (ctx && ctx.update && ctx.update.message) {
