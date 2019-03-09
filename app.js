@@ -52,9 +52,9 @@ bot.on('new_chat_members', (ctx) => {
         membersFirstName += newMembers[i].first_name;
     }
     var message = "Dear " + membersFirstName
-    + ". Heartiest welcome to the NITK alumni group! It's a pleasure to have you here."
+    + ".\n\nHeartiest welcome to the NITK alumni group! It's a pleasure to have you here.\n\n"
     + " Please introduce yourself to me, by clicking, @" + config.get('botName')
-    + " And I shall further introduce you to everyone."
+    + " And I shall further introduce you to everyone here."
     ctx.reply(message);
 })
 
@@ -91,7 +91,7 @@ bot.on('text', (ctx) => {
                     var reply = "Meet " + user.from.first_name + " " 
                     + (user.from.last_name ? user.from.last_name : "") + "\n";
                     constants.questions.map(question => {
-                        reply += question.answer_key + " - " + user[question.answer_key] + "\n";
+                        reply += "<strong>" + question.answer_key.toUpperCase() + "</strong> - " + user[question.answer_key] + "\n";
                     })
                     ctx.reply(reply);
                 } else {
@@ -145,7 +145,7 @@ function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
     delete(userObj['last_asked']);
     dbo.collection(config.get('mongoCollections.users')).updateOne({"from.id" : userObj.from.id },
     {$set : userObj, $inc: {last_asked :1}}, function(error, res) {
-        console.log("Updating users in mongo::::::: error = ", error, " result = ", res);
+        console.log("Updating users in mongo::::::: error = ", error, " result = ", JSON.stringify(res.result));
         return cb(error, result);
     })
 }
