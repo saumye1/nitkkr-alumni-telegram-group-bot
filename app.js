@@ -12,7 +12,7 @@ bot.start((ctx) => {
     var chat = message && message.chat;
     if (chat && chat.type == 'private') {
         ctx.reply('Dear ' + from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.\n\n' 
-        + '(1/5) Which batch are you from(the year you took admission)?(YYYY format)');
+        + '(1/6) Which batch are you from(the year you took admission)?(YYYY format)');
         console.log("Message from = ", ctx.message);
         var updateObj = {
             from : from,
@@ -22,6 +22,7 @@ bot.start((ctx) => {
             email : '',
             organization: '',
             designation: '',
+            branch: '',
             last_asked: 1
         }
         dbo.collection(config.get('mongoCollections.users')).updateOne({"from.id" : from.id}, 
