@@ -7,8 +7,7 @@ function sendMessage(ctxObj, message, type, chatType) {
     var messageSent = ctxObj.reply(message);
     messageSent.then(messageInfo => { 
         console.log("Message Sent was ::: ", JSON.stringify(messageInfo));
-        dbo.collection(config.get('mongoCollections.messageLogs')).updateOne(
-            {"message_info.message_id" : messageInfo.message_id},
+        dbo.collection(config.get('mongoCollections.messageLogs')).insert(
             {
                 message_info : messageInfo,
                 datetime : new Date().getTime(),
@@ -16,7 +15,7 @@ function sendMessage(ctxObj, message, type, chatType) {
                 type : type,
                 chat_type: chatType
             },
-            {upsert:true}, function(error, result) {
+            function(error, result) {
                 console.log("::::::::::: Inserting message log ::::::::::", error, result);
         })
     } );
