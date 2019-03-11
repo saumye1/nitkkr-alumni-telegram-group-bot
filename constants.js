@@ -48,13 +48,13 @@ exports.messageTypes = {
 }
 
 exports.helpMessage = 'Hi! I am @' + config.get('botName') 
-+ ". This is NIT Kurukshetra Alumni group.\n\n" 
-+ " I currently only help introduce alumni of NIT Kurukshetra to each other.\n\n"
++ "\n\nI currently only help introduce alumni of NIT Kurukshetra to each other.\n\n"
 + " You can start by first introducing yourself to me in a private" 
 + " chat by clicking my handle in the beginning of this message"
-+ " and then come back here and ask me to introduce you."
-+ "\n\nList of private commands:"
-+ "\nmybatchmates"
++ " and then in the NIT KKR alumni group ask me to introduce you."
++ "\n\nBot Development credits: Saumye Malhotra (@algoro) and Devender Yadav (@itsmedev)"
++ "\n\nList of commands:"
++ "\n/mybatchmates - gives a list of your batchmates - Developer credits: Narendra Kumawat"
 
 exports.startPublicMessage = "Please introduce yourself on a private chat with me, click @" + config.get('botName')
 + ".\n\n**This command is meant to be used on a private chat only.**"
