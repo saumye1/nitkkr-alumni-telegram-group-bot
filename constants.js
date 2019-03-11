@@ -35,3 +35,26 @@ exports.questions = [{
     is_asked: false,
     answer_key: 'branch'
 }]
+
+exports.messageTypes = {
+    'start' : 1,
+    'help' : 1,
+    'welcome' : 1,
+    'search' : 1,
+    'introComplete' : 1,
+    'nextQuestion' : 1,
+    'introductory' : 1,
+    'introHelp' : 1
+}
+
+exports.helpMessage = 'Hi! I am @' + config.get('botName') 
++ ". This is NIT Kurukshetra Alumni group.\n\n" 
++ " I currently only help introduce alumni of NIT Kurukshetra to each other.\n\n"
++ " You can start by first introducing yourself to me in a private" 
++ " chat by clicking my handle in the beginning of this message"
++ " and then come back here and ask me to introduce you."
++ "\n\nList of private commands:"
++ "\nmybatchmates"
+
+exports.startPublicMessage = "Please introduce yourself on a private chat with me, click @" + config.get('botName')
++ ".\n\n**This command is meant to be used on a private chat only.**"

@@ -1,8 +1,9 @@
+config          = require('config');
 var Telegraf    = require('telegraf');
-var config      = require('config');
 var MongoClient = require('mongodb').MongoClient;
 
 var constants   = require('./constants');
+var utility     = require('./utility');
 
 var bot = new Telegraf(config.get('botToken'));
 
@@ -11,8 +12,9 @@ bot.start((ctx) => {
     var from = message && message.from;
     var chat = message && message.chat;
     if (chat && chat.type == 'private') {
-        ctx.reply('Dear ' + from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.\n\n' 
-        + '(1/6) Which batch are you from(the year you took admission)?(YYYY format)');
+        var mess = 'Dear ' + from.first_name + ', I suppose you are a NIT Kurukshetra Alumnus.\n\n' 
+        + '(1/6) Which batch are you from(the year you took admission)?(YYYY format)';
+        utility.sendMessage(ctx, mess, 'start', chat.type);
         console.log("Message from = ", ctx.message);
         var updateObj = {
             from : from,
@@ -28,18 +30,12 @@ bot.start((ctx) => {
         dbo.collection(config.get('mongoCollections.users')).updateOne({"from.id" : from.id}, 
         { $set : updateObj }, {upsert: true}, function(error, result) {})
     } else {
-        ctx.reply("Please introduce yourself on a private chat with me, click @" + config.get('botName')
-        + ".\n\n**This command is meant to be used on a private chat only.**");
+        utility.sendMessage(ctx, constants.startPublicMessage, 'start', 'group');
     }
 }); 
 
 bot.help((ctx) => {
-    ctx.reply('Hi! I am @' + config.get('botName') 
-    + ". This is NIT Kurukshetra Alumni group.\n\n" 
-    + " I currently only help introduce alumni of NIT Kurukshetra to each other.\n\n"
-    + " You can start by first introducing yourself to me in a private" 
-    + " chat by clicking my handle in the beginning of this message"
-    + " and then come back here and ask me to introduce you.");
+    utility.sendMessage(ctx, constants.helpMessage, 'help', 'any');
 });
 
 bot.on('new_chat_members', (ctx) => {
@@ -56,7 +52,7 @@ bot.on('new_chat_members', (ctx) => {
     + ".\n\nHeartiest welcome to the NITK alumni group! It's a pleasure to have you here.\n\n"
     + " Please introduce yourself to me, by clicking, @" + config.get('botName')
     + " And I shall further introduce you to everyone here."
-    ctx.reply(message);
+    utility.sendMessage(ctx, message, 'welcome', 'any');
 })
 
 bot.on('text', (ctx) => {
@@ -82,21 +78,22 @@ bot.on('text', (ctx) => {
                         } 
                         reply += "\n";
                         }, function(latNull) {
-                            ctx.reply(reply); 
+                            utility.sendMessage(ctx, reply, 'search', 'private'); 
                     }) 
                 })
-            }else {
+            } else {
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
                     var questionId = user.last_asked;
 
                     //when this answer is to last question, redirect to alumni group and ask to introduce
                     updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
                         if (!result.nextQuestion) {
-                            ctx.reply("It's pleasure to know you!\n\nPlease type /introduceMe@" 
-                            + config.get('botName') + " in the NIT Kurkshetra Alumni group.");
+                            var mess = "It's pleasure to know you!\n\nPlease type /introduceMe@" 
+                            + config.get('botName') + " in the NIT Kurkshetra Alumni group.";
+                            utility.sendMessage(ctx, mess, 'introComplete', 'private');
                         } else {
                             var nextQuestion = result.nextQuestion;
-                            ctx.reply(nextQuestion);
+                            utility.sendMessage(ctx, nextQuestion, 'nextQuestion', 'private');
                         }
                     });
                 })
@@ -110,10 +107,11 @@ bot.on('text', (ctx) => {
                     constants.questions.map(question => {
                         reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
                     })
-                    ctx.reply(reply);
+                    utility.sendMessage(ctx, reply, 'introductory', 'group');
                 } else {
-                    ctx.reply("Dear " + from.first_name 
-                    + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName'));
+                    var mess = "Dear " + from.first_name 
+                    + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName');
+                    utility.sendMessage(ctx, mess, 'introHelp', 'group');
                 }
             })
         } 
@@ -129,6 +127,9 @@ function startInitialProcess() {
         console.log("Database initialized");
         db = database;
         dbo = db.db(config.get('databaseSettings.name'))
+        setInterval(function () {
+            utility.deleteUnnecessaryMessages(bot)
+        }, config.get('messageDeleteHeartBeatRate'));
       } else {
         console.error("Error while connecting to mongo");
         throw err;
