@@ -5,18 +5,21 @@ function sendMessage(ctxObj, message, type, chatType) {
     //if type is introductory message don't delete
     //log all messages sent in mongo, for later to be deleted or referred deletion purpose
     var messageSent = ctxObj.reply(message);
-    var messageInfo = {};
-    messageSent.then(messageData => { messageInfo = messageData } );
-    dbo.collection(config.get('mongoCollections.messageLogs')).updateOne(
-        {"message_info.message_id" : messageInfo.message_id},
-        {
-            message_info : messageInfo,
-            datetime : new Date().getTime(),
-            is_deleted : false,
-            type : type,
-            chat_type: chatType
-        },
-        {upsert:true}, function(error, result) {})
+    messageSent.then(messageInfo => { 
+        console.log("Message Sent was ::: ", JSON.stringify(messageInfo));
+        dbo.collection(config.get('mongoCollections.messageLogs')).updateOne(
+            {"message_info.message_id" : messageInfo.message_id},
+            {
+                message_info : messageInfo,
+                datetime : new Date().getTime(),
+                is_deleted : false,
+                type : type,
+                chat_type: chatType
+            },
+            {upsert:true}, function(error, result) {
+                console.log("::::::::::: Inserting message log ::::::::::", error, result);
+        })
+    } );
 }
 
 //delete only, not private, not introductory messages, not deleted
