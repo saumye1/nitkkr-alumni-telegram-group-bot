@@ -89,7 +89,7 @@ bot.on('text', (ctx) => {
                 //get batchmates of given year { pattern is /batch_YYYY }
                 var year = textMsg.split('atch_')[1];
                 var reply = `Here are batchmates from ${year} : \n`;
-                dbo.collection(config.get('mongoCollections.users')).find({"batch" : year}).toArray( function(err , batchmates) {
+                dbo.collection(config.get('mongoCollections.users')).find({"batch" : new RegExp(year)}).toArray( function(err , batchmates) {
                     batchmates.map(batchmate => {
                         reply += batchmate.from.first_name ;
                         if( batchmate.from.last_name) {
