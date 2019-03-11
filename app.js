@@ -108,6 +108,10 @@ bot.on('text', (ctx) => {
                         reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
                     })
                     utility.sendMessage(ctx, reply, 'introductory', 'group');
+                } else if (user && user.last_asked == constants.questions.length + 1) {
+                    var mess = "Dear " + from.first_name
+                    + ". Please try to run this command in a private chat."
+                    utility.sendMessage(ctx, mess, 'commandHelp', 'group');
                 } else {
                     var mess = "Dear " + from.first_name 
                     + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName');
