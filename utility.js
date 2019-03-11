@@ -36,6 +36,19 @@ function deleteUnnecessaryMessages(bot) {
                 }
                 var ids = result.map(message => {return message._id});
                 console.log("The following IDs were deleted:\n", JSON.stringify(ids));
+                dbo.collection(config.get('mongoCollections.messageLogs')).update(
+                {
+                    is_deleted : false, 
+                    type : {$ne : 'introductory'},
+                    chat_type : {$ne : 'private'}
+                }, {$set : {is_deleted : true}}, {multi : true},
+                    function(error, res) {
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.log("All updated deleted smoothely");
+                        }
+                    })
             }
         }) 
 }
