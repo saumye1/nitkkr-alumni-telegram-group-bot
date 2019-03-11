@@ -31,7 +31,7 @@ bot.start((ctx) => {
         ctx.reply("Please introduce yourself on a private chat with me, click @" + config.get('botName')
         + ".\n\n**This command is meant to be used on a private chat only.**");
     }
-});
+}); 
 
 bot.help((ctx) => {
     ctx.reply('Hi! I am @' + config.get('botName') 
@@ -71,20 +71,36 @@ bot.on('text', (ctx) => {
         //ask next question from unanswered set
         if (messageRecieved.chat.type == 'private') {
             //reply only if private chat
-            dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
-                var questionId = user.last_asked;
+            if(textMsg.toLowerCase().search('mybatchmates') >= 0) {
+                //get my batchmates
+                dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
+                    var reply = "Here are your batchmates : \n";
+                    dbo.collection(config.get('mongoCollections.users')).find({"batch" : user.batch}).forEach(function(batchmate) {
+                        reply += batchmate.from.first_name ;
+                        if( batchmate.from.last_name) {
+                            reply += " " + batchmate.from.last_name;
+                        } 
+                        reply += "\n";
+                        }, function(latNull) {
+                            ctx.reply(reply); 
+                    }) 
+                })
+            }else {
+                dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
+                    var questionId = user.last_asked;
 
-                //when this answer is to last question, redirect to alumni group and ask to introduce
-                updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
-                    if (!result.nextQuestion) {
-                        ctx.reply("It's pleasure to know you!\n\nPlease type /introduceMe@" 
-                        + config.get('botName') + " in the NIT Kurkshetra Alumni group.");
-                    } else {
-                        var nextQuestion = result.nextQuestion;
-                        ctx.reply(nextQuestion);
-                    }
-                });
-            })
+                    //when this answer is to last question, redirect to alumni group and ask to introduce
+                    updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
+                        if (!result.nextQuestion) {
+                            ctx.reply("It's pleasure to know you!\n\nPlease type /introduceMe@" 
+                            + config.get('botName') + " in the NIT Kurkshetra Alumni group.");
+                        } else {
+                            var nextQuestion = result.nextQuestion;
+                            ctx.reply(nextQuestion);
+                        }
+                    });
+                })
+            }
         } else if (textMsg.search('@' + config.get('botName')) >= 0) {
             dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
                 if ( (textMsg.toLowerCase().search('introduceme') >= 0 || textMsg.toLowerCase().search('introduce me') >= 0) && user 
@@ -100,7 +116,7 @@ bot.on('text', (ctx) => {
                     + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName'));
                 }
             })
-        }
+        } 
     }
 })
 
