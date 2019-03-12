@@ -71,15 +71,58 @@ bot.on('text', (ctx) => {
                 //get my batchmates
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
                     var reply = "Here are your batchmates : \n";
-                    dbo.collection(config.get('mongoCollections.users')).find({"batch" : user.batch}).forEach(function(batchmate) {
+                    dbo.collection(config.get('mongoCollections.users')).find({"batch" : user.batch}).toArray( function(err , batchmates) {
+                        batchmates.map(batchmate => {
+                            console.log(batchmate)
+                            reply += batchmate.from.first_name ;
+                            if( batchmate.from.last_name) {
+                                reply +=  ` ${batchmate.from.last_name} `;
+                            } 
+                            if(batchmate.from.username){
+                                reply += `(@${batchmate.from.username})\n`;
+                            }
+                        })
+                        utility.sendMessage(ctx, reply, 'search', 'private'); 
+                    })
+                })
+            } else if(textMsg.toLowerCase().search('batch_') >= 0) {
+                //get batchmates of given year { pattern is /batch_YYYY }
+                var year = textMsg.split('atch_')[1];
+                var reply = `Here are batchmates from ${year} : \n`;
+                dbo.collection(config.get('mongoCollections.users')).find({"batch" : new RegExp(year)}).toArray( function(err , batchmates) {
+                    batchmates.map(batchmate => {
                         reply += batchmate.from.first_name ;
                         if( batchmate.from.last_name) {
-                            reply += " " + batchmate.from.last_name;
+                            reply +=  ` ${batchmate.from.last_name} `;
                         } 
-                        reply += "\n";
-                        }, function(latNull) {
-                            utility.sendMessage(ctx, reply, 'search', 'private'); 
-                    }) 
+                        if(batchmate.from.username){
+                            reply += `(@${batchmate.from.username})\n`;
+                        }
+                    })
+                    if(!batchmates || !batchmates.length){
+                        reply = `No one from ${year} batch is registered.`;
+                    }
+                    utility.sendMessage(ctx, reply, 'search', 'private'); 
+                }) 
+            } else if(textMsg.toLowerCase().search('from_city_') >= 0) {
+                // pattern is /from_city_CITYNAME
+                var city = textMsg.split('rom_city_')[1];
+                var reply = `Here are peoples from ${city} : \n`;
+                dbo.collection(config.get('mongoCollections.users')).find({"location" : new RegExp(city , 'i')}).toArray( function(err , users) {
+                    users.map(user => {
+                        reply += user.from.first_name ;
+                        if( user.from.last_name) {
+                            reply += ` ${user.from.last_name} ` ;
+                        }
+                        if(user.from.username){
+                            reply += `(@${user.from.username})`;
+                        }
+                        reply += ` - ${user.location} \n` 
+                    })
+                    if(!users.length){
+                        reply = `No one from ${city} is registered.`;
+                    }
+                    utility.sendMessage(ctx, reply, 'search', 'private'); 
                 })
             } else {
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
@@ -108,6 +151,10 @@ bot.on('text', (ctx) => {
                         reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
                     })
                     utility.sendMessage(ctx, reply, 'introductory', 'group');
+                } else if (user && user.last_asked == constants.questions.length + 1) {
+                    var mess = "Dear " + from.first_name
+                    + ". Please try to run this command in a private chat."
+                    utility.sendMessage(ctx, mess, 'commandHelp', 'group');
                 } else {
                     var mess = "Dear " + from.first_name 
                     + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName');
