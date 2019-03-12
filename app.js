@@ -70,7 +70,11 @@ bot.on('text', (ctx) => {
             if(textMsg.toLowerCase().search('mybatchmates') >= 0) {
                 //get my batchmates
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
+<<<<<<< HEAD
                     var reply = "Here are your batchmates : \n";
+=======
+                    var reply = `Here are your batchmates : \n`;
+>>>>>>> ae89c414c02150d89dda785d81a7bf11cc591410
                     dbo.collection(config.get('mongoCollections.users')).find({"batch" : user.batch}).toArray( function(err , batchmates) {
                         batchmates.map(batchmate => {
                             console.log(batchmate)
