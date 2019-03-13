@@ -64,7 +64,8 @@ bot.on('text', (ctx) => {
         var textMsg = messageRecieved.text;
         var from = messageRecieved.from;
         var fromId = from.id;
-        var params = {}
+        var params = {};
+        params.dbo = dbo;
 
         //have an array of questions, ask them in order
         //ask next question from unanswered set
@@ -72,10 +73,7 @@ bot.on('text', (ctx) => {
             //reply only if private chat
             if(textMsg.toLowerCase().search("mybatchmates") >= 0) {
                 //get my batchmates
-                params = {
-                    dbo : dbo,
-                    condition : { "from.id" : fromId },
-                };
+                params.condition = { "from.id" : fromId };
                 replyService.getmyBatchMates(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
                 }).catch(error => {
@@ -84,11 +82,8 @@ bot.on('text', (ctx) => {
             } else if(textMsg.toLowerCase().search("batch_") >= 0) {
                 //get batchmates of given year { pattern is /batch_YYYY  &  /batch_YY }
                 var year = textMsg.split("atch_")[1];
-                params = {
-                    dbo: dbo,
-                    condition : { "batch" : new RegExp(year)},
-                    year : year
-                }
+                params.condition = { "batch" : new RegExp(year)};
+                params.year = year;
                 replyService.getBatchMatesByYear(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
                 }).catch(error => {
