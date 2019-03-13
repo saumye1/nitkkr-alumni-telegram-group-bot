@@ -178,6 +178,10 @@ function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
     for (var i in questions) {
         if ( !questions[i].is_asked ) {
             result.nextQuestion = questions[i].question;
+            if (questions[i].hasOwnProperty("allowed_answers")) {
+                result.nextQuestion += "\n\nList of allowed answers:\n" 
+                + Object.keys(questions[i].allowed_answers).join('\n').toString();
+            }
             questions[i].is_asked = true;
             break;
         }
@@ -198,7 +202,8 @@ function capitalizeFirstLetter(str) {
 
 function validValueForField(fieldLabel, textMsg) {
     var regex;
-    var allFieldLabels = constants.questions.map(question => { return question.answer_key; })
+    var questions = constants.questions;
+    var allFieldLabels = questions.map(question => { return question.answer_key; })
     switch(fieldLabel) {
         case "batch" :
         regex = /[0-9][0-9][0-9][0-9]/;
@@ -213,7 +218,12 @@ function validValueForField(fieldLabel, textMsg) {
     }
     if ( !regex.test(textMsg) 
     || ( allFieldLabels.findIndex(field => { return field == fieldLabel}) == -1 )
-    || ( fieldLabel == "batch" && parseInt(textMsg) > 2015 )) {
+    || ( fieldLabel == "batch" && parseInt(textMsg) > 2015 ) ) {
+        return false;
+    }
+    var labelIdx = allFieldLabels.findIndex(field => { return field == fieldLabel});
+    if (questions[labelIdx].hasOwnProperty("allowed_answers") 
+    && !questions[labelIdx].allowed_answers.hasOwnProperty(textMsg)) {
         return false;
     }
 

@@ -30,7 +30,17 @@ exports.questions = [{
     answer_key: 'email'
 }, {
     id: 6,
-    question: "(6/6) What was your branch?(one word)",
+    question: "(6/6) What was your branch?",
+    allowed_answers: {
+        "Electrical" : 1,
+        "Electronics" : 2,
+        "IT" : 3,
+        "Mechanical" : 4,
+        "Computer Science" : 5,
+        "IEM" : 6,
+        "Civil" : 7,
+        "Other" : 8
+    },
     is_answered: false,
     is_asked: false,
     answer_key: 'branch'
