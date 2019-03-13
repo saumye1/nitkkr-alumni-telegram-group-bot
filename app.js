@@ -76,17 +76,16 @@ bot.on('text', (ctx) => {
                 params.condition = { "from.id" : fromId };
                 replyService.getmyBatchMates(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
-                }).catch(error => {
+                }).catch((error) => {
                     console.log(error);
                 });
             } else if(textMsg.toLowerCase().search("batch_") >= 0) {
                 //get batchmates of given year { pattern is /batch_YYYY  &  /batch_YY }
-                var year = textMsg.split("atch_")[1];
-                params.condition = { "batch" : new RegExp(year)};
-                params.year = year;
+                params.year = textMsg.split("atch_")[1];
+                params.condition = { "batch" : new RegExp(params.year)};
                 replyService.getBatchMatesByYear(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
-                }).catch(error => {
+                }).catch((error) => {
                     console.log(error);
                 });
             } else {
