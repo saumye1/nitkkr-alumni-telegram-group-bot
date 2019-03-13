@@ -5,7 +5,7 @@ var MongoClient = require('mongodb').MongoClient;
 var constants   = require('./constants');
 var utility     = require('./utility');
 
-var replyService = require('./services/replyService');
+var replyService = require("./services/replyService");
 
 var bot = new Telegraf(config.get('botToken'));
 
@@ -64,35 +64,36 @@ bot.on('text', (ctx) => {
         var textMsg = messageRecieved.text;
         var from = messageRecieved.from;
         var fromId = from.id;
+        var params = {}
 
         //have an array of questions, ask them in order
         //ask next question from unanswered set
         if (messageRecieved.chat.type == 'private') {
             //reply only if private chat
-            if(textMsg.toLowerCase().search('mybatchmates') >= 0) {
+            if(textMsg.toLowerCase().search("mybatchmates") >= 0) {
                 //get my batchmates
-                var params = {
+                params = {
                     dbo : dbo,
                     condition : { "from.id" : fromId },
                 };
-                replyService.getmyBatchMates(params).then(reply => {
+                replyService.getmyBatchMates(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
                 }).catch(error => {
                     console.log(error);
-                })
-            } else if(textMsg.toLowerCase().search('batch_') >= 0) {
+                });
+            } else if(textMsg.toLowerCase().search("batch_") >= 0) {
                 //get batchmates of given year { pattern is /batch_YYYY  &  /batch_YY }
-                var year = textMsg.split('atch_')[1];
-                var params = {
+                var year = textMsg.split("atch_")[1];
+                params = {
                     dbo: dbo,
                     condition : { "batch" : new RegExp(year)},
                     year : year
                 }
-                replyService.getBatchMatesByYear(params).then(reply => {
+                replyService.getBatchMatesByYear(params).then((reply) => {
                     utility.sendMessage(ctx, reply, 'search', 'private');
                 }).catch(error => {
                     console.log(error);
-                })
+                });
             } else {
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
                     var questionId = user.last_asked;
