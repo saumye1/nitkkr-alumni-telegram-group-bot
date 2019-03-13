@@ -45,7 +45,8 @@ exports.messageTypes = {
     'nextQuestion' : 1,
     'introductory' : 1,
     'introHelp' : 1,
-    'commandHelp' : 1
+    'commandHelp' : 1,
+    'invalidFormat' : 1
 }
 
 exports.helpMessage = 'Hi! I am @' + config.get('botName') 
@@ -59,3 +60,8 @@ exports.helpMessage = 'Hi! I am @' + config.get('botName')
 
 exports.startPublicMessage = "Please introduce yourself on a private chat with me, click @" + config.get('botName')
 + ".\n\n**This command is meant to be used on a private chat only.**"
+
+exports.formatErrorMessage = "Please answer in the given format.";
+
+exports.introCompleteMessage = "It's pleasure to know you!\n\nPlease type /introduceMe@" 
++ config.get('botName') + " in the NIT Kurkshetra Alumni group.";
