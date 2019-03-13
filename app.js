@@ -118,7 +118,7 @@ bot.on("text", (ctx) => {
                     + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName');
                     utility.sendMessage(ctx, mess, "introHelp", "group");
                 }
-            }
+            })
         } 
     }
 })
