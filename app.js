@@ -6,6 +6,7 @@ var constants   = require('./constants');
 var utility     = require('./utility');
 
 var bot = new Telegraf(config.get("botToken"));
+var replyService = require('./services/replyService');
 
 bot.start((ctx) => {
     var message = ctx.message;
@@ -27,12 +28,12 @@ bot.start((ctx) => {
             branch: '',
             last_asked: 1
         }
-        dbo.collection(config.get("mongoCollections.users")).updateOne({"from.id" : from.id}, 
+        dbo.collection(config.get("mongoCollections.users")).updateOne({"from.id" : from.id},
         { $set : updateObj }, {upsert: true}, function(error, result) {})
     } else {
         utility.sendMessage(ctx, constants.startPublicMessage, "start", "group");
     }
-}); 
+});
 
 bot.help((ctx) => {
     utility.sendMessage(ctx, constants.helpMessage, "help", "any");
@@ -69,17 +70,27 @@ bot.on("text", (ctx) => {
             //reply only if private chat
             if(textMsg.toLowerCase().search('mybatchmates') >= 0) {
                 //get my batchmates
-                dbo.collection(config.get("mongoCollections.users")).findOne({"from.id" : fromId}, function(error, user) {
-                    var reply = "Here are your batchmates : \n";
-                    dbo.collection(config.get("mongoCollections.users")).find({"batch" : user.batch}).forEach(function(batchmate) {
-                        reply += capitalizeFirstLetter(batchmate.from.first_name.toLowerCase()) ;
-                        if( batchmate.from.last_name) {
-                            reply += " " + capitalizeFirstLetter(batchmate.from.last_name.toLowerCase());
-                        } 
-                        reply += "\n";
-                        }, function(latNull) {
-                            utility.sendMessage(ctx, reply, "search", "private"); 
-                    }) 
+                var params = {
+                    dbo : dbo,
+                    condition : { "from.id" : fromId },
+                };
+                replyService.getmyBatchMates(params).then((reply) => {
+                    utility.sendMessage(ctx, reply, 'search', 'private');
+                }).catch((error) => {
+                    console.log(error);
+                })
+            } else if(textMsg.toLowerCase().search('batch_') >= 0) {
+                //get batchmates of given year { pattern is /batch_YYYY  &  /batch_YY }
+                var year = textMsg.split('atch_')[1];
+                var params = {
+                    dbo: dbo,
+                    condition : { "batch" : new RegExp(year)},
+                    year : year
+                }
+                replyService.getBatchMatesByYear(params).then((reply) => {
+                    utility.sendMessage(ctx, reply, 'search', 'private');
+                }).catch((error) => {
+                    console.log(error);
                 })
             } else {
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
@@ -101,9 +112,9 @@ bot.on("text", (ctx) => {
             }
         } else if (textMsg.search('@' + config.get('botName')) >= 0) {
             dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
-                if ( (textMsg.toLowerCase().search('introduceme') >= 0 || textMsg.toLowerCase().search('introduce me') >= 0) && user 
+                if ( (textMsg.toLowerCase().search('introduceme') >= 0 || textMsg.toLowerCase().search('introduce me') >= 0) && user
                 && user.last_asked == constants.questions.length + 1) {
-                    var reply = "Meet " + user.from.first_name + " " 
+                    var reply = "Meet " + user.from.first_name + " "
                     + (user.from.last_name ? user.from.last_name : "") + "\n";
                     constants.questions.map(question => {
                         reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
@@ -114,12 +125,12 @@ bot.on("text", (ctx) => {
                     + ". Please try to run this command in a private chat."
                     utility.sendMessage(ctx, mess, "commandHelp", "group");
                 } else {
-                    var mess = "Dear " + from.first_name 
+                    var mess = "Dear " + from.first_name
                     + ". I am a bot. Please introduce yourself on a private chat to @" + config.get('botName');
                     utility.sendMessage(ctx, mess, "introHelp", "group");
                 }
             })
-        } 
+        }
     }
 })
 
@@ -141,7 +152,7 @@ function startInitialProcess() {
       }
     })
 }
-  
+
 startInitialProcess();
 
 function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
@@ -169,7 +180,7 @@ function updateAnswerToQuestionForUser(userObj, questionId, textMsg, cb) {
         if ( !questions[i].is_asked ) {
             result.nextQuestion = questions[i].question;
             if (questions[i].hasOwnProperty("allowed_answers")) {
-                result.nextQuestion += "\n\nList of allowed answers:\n" 
+                result.nextQuestion += "\n\nList of allowed answers:\n"
                 + Object.keys(questions[i].allowed_answers).join('\n').toString();
             }
             questions[i].is_asked = true;
@@ -198,7 +209,7 @@ function validValueForField(fieldLabel, textMsg) {
         case "batch" :
         regex = /[0-9][0-9][0-9][0-9]/;
         break;
-        
+
         case "email" :
         regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         break;
@@ -206,13 +217,13 @@ function validValueForField(fieldLabel, textMsg) {
         default:
         regex = /^[a-zA-Z0-9,]/
     }
-    if ( !regex.test(textMsg) 
+    if ( !regex.test(textMsg)
     || ( allFieldLabels.findIndex(field => { return field == fieldLabel}) == -1 )
     || ( fieldLabel == "batch" && parseInt(textMsg) > 2015 ) ) {
         return false;
     }
     var labelIdx = allFieldLabels.findIndex(field => { return field == fieldLabel});
-    if (questions[labelIdx].hasOwnProperty("allowed_answers") 
+    if (questions[labelIdx].hasOwnProperty("allowed_answers")
     && !questions[labelIdx].allowed_answers.hasOwnProperty(textMsg)) {
         return false;
     }
