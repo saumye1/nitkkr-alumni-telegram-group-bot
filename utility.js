@@ -26,9 +26,9 @@ function deleteUnnecessaryMessages(bot) {
     var deletionTime = new Date().getTime();
     var condition = {
         is_deleted : false, 
-        type : {$ne : 'introductory'},
-        chat_type : {$ne : 'private'},
-        datetime : {$lt : deletionTime - config.get('deletePeriod')}
+        type : { $nin : ['introductory'] },
+        chat_type : { $nin : ['private'] },
+        datetime : { $lt : deletionTime - config.get('deletePeriod') }
     };
     dbo.collection(config.get('mongoCollections.messageLogs')).find(condition).toArray( function(err, result) {
         console.log("Finding messages that have been more than " 

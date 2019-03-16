@@ -208,7 +208,8 @@ function validValueForField(fieldLabel, textMsg) {
     }
     if ( !regex.test(textMsg) 
     || ( allFieldLabels.findIndex(field => { return field == fieldLabel}) == -1 )
-    || ( fieldLabel == "batch" && parseInt(textMsg) > 2015 ) ) {
+    || ( fieldLabel == "batch" && ( isNaN(parseInt(textMsg)) || parseInt(textMsg) > 2015 ) ) 
+    || textMsg.length > 200 ) {
         return false;
     }
     var labelIdx = allFieldLabels.findIndex(field => { return field == fieldLabel});
