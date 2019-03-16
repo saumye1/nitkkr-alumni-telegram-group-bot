@@ -1,5 +1,6 @@
 exports.sendMessage                 = sendMessage;
 exports.deleteUnnecessaryMessages   = deleteUnnecessaryMessages;
+exports.logMessage                  = logMessage;
 
 function sendMessage(ctxObj, message, type, chatType) {
     //if type is introductory message don't delete
@@ -7,7 +8,7 @@ function sendMessage(ctxObj, message, type, chatType) {
     var messageSent = ctxObj.reply(message);
     messageSent.then(messageInfo => { 
         console.log("Message Sent was ::: ", JSON.stringify(messageInfo));
-        dbo.collection(config.get('mongoCollections.messageLogs')).insert(
+        dbo.collection(config.get("mongoCollections.messageLogs")).insert(
             {
                 message_info : messageInfo,
                 datetime : new Date().getTime(),
@@ -30,7 +31,7 @@ function deleteUnnecessaryMessages(bot) {
         chat_type : { $nin : ['private'] },
         datetime : { $lt : deletionTime - config.get('deletePeriod') }
     };
-    dbo.collection(config.get('mongoCollections.messageLogs')).find(condition).toArray( function(err, result) {
+    dbo.collection(config.get("mongoCollections.messageLogs")).find(condition).toArray( function(err, result) {
         console.log("Finding messages that have been more than " 
         + config.get('deletePeriod') / (1000 * 60 * 60) + " hours old", result && result.length);
         if (!err && result && result.length) {
@@ -40,7 +41,7 @@ function deleteUnnecessaryMessages(bot) {
             }
             var ids = result.map(message => {return message._id});
             console.log("The following IDs were deleted:\n", JSON.stringify(ids));
-            dbo.collection(config.get('mongoCollections.messageLogs')).update(condition,
+            dbo.collection(config.get("mongoCollections.messageLogs")).update(condition,
                 {$set : {is_deleted : true}}, {multi : true},
                 function(error, res) {
                     if (error) {
@@ -51,4 +52,14 @@ function deleteUnnecessaryMessages(bot) {
                 })
         }
     }) 
+}
+
+function logMessage(messageInfo) {
+    dbo.collection(config.get("mongoCollections.otherMessageLogs")).insert({
+        message_info : messageInfo,
+        datetime : new Date().getTime(),
+        is_deleted : false
+    }, function(error, result) {
+        console.log("::::::::::: Inserting message log ::::::::::", error, result);
+    })
 }

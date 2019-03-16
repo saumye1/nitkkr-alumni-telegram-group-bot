@@ -63,6 +63,7 @@ bot.on("text", (ctx) => {
         var from = messageRecieved.from;
         var fromId = from.id;
 
+        utility.logMessage(ctx.update.message);
         //have an array of questions, ask them in order
         //ask next question from unanswered set
         if (messageRecieved.chat.type == "private") {
