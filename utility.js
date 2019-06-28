@@ -4,6 +4,8 @@ exports.logMessage                  = logMessage;
 exports.sendMessageToChatById       = sendMessageToChatById;
 exports.sendLocationCollectionMessage = sendLocationCollectionMessage;
 
+var constants = require('./constants');
+
 function sendMessage(ctxObj, message, type, chatType) {
     //if type is introductory message don't delete
     //log all messages sent in mongo, for later to be deleted or referred deletion purpose
@@ -72,10 +74,10 @@ function sendMessageToChatById(bot, chatId, message){
 
 function sendLocationCollectionMessage(bot){
     let targetUsers = {
-        homeLoc : {$exists: false},
-        locationReqSentAt: {$exists: false}
+        homeLoc : {'$exists': false},
+        locationReqSentAt: {'$exists': false}
     };
-    dbo.collection(config.get("mongoCollections.users")).find(targetUsers, function(err, users) {
+    dbo.collection(config.get("mongoCollections.users")).find(targetUsers).toArray(function(err, users) {
         console.log(`finding location target users :: err = ${err}, result = ${users.length}`);
         if (err || !users || !users.length) {
           return;
