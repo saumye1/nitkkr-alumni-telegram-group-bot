@@ -73,15 +73,42 @@ bot.on("text", (ctx) => {
                 //get my batchmates
                 dbo.collection(config.get("mongoCollections.users")).findOne({"from.id" : fromId}, function(error, user) {
                     var reply = "Here are your batchmates : \n";
-                    dbo.collection(config.get("mongoCollections.users")).find({"batch" : user.batch}).forEach(function(batchmate) {
-                        reply += capitalizeFirstLetter(batchmate.from.first_name.toLowerCase()) ;
-                        if( batchmate.from.last_name) {
+                    var count = 1;
+                    dbo.collection(config.get("mongoCollections.users")).find({"batch" : user.batch}).sort({first_name: 1}).forEach(function(batchmate) {
+                        if(batchmate.from.id !== fromId) {
+                            reply += count.toString() +". " + capitalizeFirstLetter(batchmate.from.first_name.toLowerCase()) ;
+                            if(batchmate.from.last_name) {
+                                reply += " " + capitalizeFirstLetter(batchmate.from.last_name.toLowerCase());
+                            }
+                            if(batchmate.branch) {
+                                reply += " (" + capitalizeFirstLetter(batchmate.branch.toLowerCase()) + ")";
+                            }
+                            reply += "\n";
+                            count += 1;
+                        }
+                    }, function(latNull) {
+                        utility.sendMessage(ctx, reply, "search", "private");
+                    })
+                })
+            } else if(textMsg.toLowerCase().search('batch_') >= 0) {
+                //get batchmates of given year { pattern is /batch_YYYY  &  /batch_YY }
+                var year = textMsg.split('atch_')[1];
+                var reply = "Here are batchmates of year " + year + " : \n";
+                var count = 1;
+                dbo.collection(config.get("mongoCollections.users")).find({"batch" : new RegExp(year)}).sort({first_name: 1}).forEach(function(batchmate) {
+                    if(batchmate.from.id !== fromId) {
+                        reply += count.toString() +". " + capitalizeFirstLetter(batchmate.from.first_name.toLowerCase()) ;
+                        if(batchmate.from.last_name) {
                             reply += " " + capitalizeFirstLetter(batchmate.from.last_name.toLowerCase());
                         }
+                        if(batchmate.branch) {
+                            reply += " (" + capitalizeFirstLetter(batchmate.branch.toLowerCase()) + ")";
+                        }
                         reply += "\n";
-                        }, function(latNull) {
-                            utility.sendMessage(ctx, reply, "search", "private");
-                    })
+                        count += 1;
+                    }
+                }, function(latNull) {
+                    utility.sendMessage(ctx, reply, "search", "private");
                 })
             } else {
                 dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
