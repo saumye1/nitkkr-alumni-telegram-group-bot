@@ -76,4 +76,4 @@ exports.formatErrorMessage = "Please answer in the given format.";
 exports.introCompleteMessage = "It's pleasure to know you!\n\nPlease type /introduceMe@"
 + config.get('botName') + " in the NIT Kurkshetra Alumni group.";
 
-exports.locationCollectionMessage = 'Please send your location (as an attachment, by first clicking the attachment sign below).';
+exports.locationCollectionMessage = 'Please send your location (as an attachment, by first clicking the attachment sign below). Note: Your location will only be used to find your college friends near you and to better organize events in future.';
