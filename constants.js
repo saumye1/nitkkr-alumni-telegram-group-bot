@@ -59,9 +59,9 @@ exports.messageTypes = {
     'invalidFormat' : 1
 }
 
-exports.helpMessage = 'Hi! I am @' + config.get('botName') 
+exports.helpMessage = 'Hi! I am @' + config.get('botName')
 + "\n\nI currently only help introduce alumni of NIT Kurukshetra to each other.\n\n"
-+ " You can start by first introducing yourself to me in a private" 
++ " You can start by first introducing yourself to me in a private"
 + " chat by clicking my handle in the beginning of this message"
 + " and then in the NIT KKR alumni group ask me to introduce you."
 + "\n\nBot Development credits: Saumye Malhotra (@algoro) and Devender Yadav (@itsmedev)"
@@ -73,5 +73,7 @@ exports.startPublicMessage = "Please introduce yourself on a private chat with m
 
 exports.formatErrorMessage = "Please answer in the given format.";
 
-exports.introCompleteMessage = "It's pleasure to know you!\n\nPlease type /introduceMe@" 
+exports.introCompleteMessage = "It's pleasure to know you!\n\nPlease type /introduceMe@"
 + config.get('botName') + " in the NIT Kurkshetra Alumni group.";
+
+exports.locationCollectionMessage = 'Please send your location (as an attachment, by first clicking the attachment sign below).';
