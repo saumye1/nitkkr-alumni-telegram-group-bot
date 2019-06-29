@@ -10,7 +10,7 @@ exports.searches = {
           let count = 1;
           resultArr.sort((a, b) => {return a.from.first_name > b.from.first_name});
           resultArr.map(user => {
-              resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}\n`;
+              resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.from.first_name)} ${user.from.last_name ? capitalizeFirstLetter(user.from.last_name) : ''}\n`;
               count = count + 1;
           });
           return resultStr;
@@ -39,7 +39,7 @@ exports.searches = {
         let count = 1;
         resultArr.sort((a, b) => {return a.from.first_name > b.from.first_name});
         resultArr.map(user => {
-            resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}\n`;
+            resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.from.first_name)} ${user.from.last_name ? capitalizeFirstLetter(user.from.last_name) : ''}\n`;
             count = count + 1;
         });
         return resultStr;
