@@ -8,7 +8,7 @@ exports.searches = {
       getRespStr: function(resultArr) {
           let resultStr = 'Here are your batch mates: \n';
           let count = 1;
-          resultArr.sort((a, b) => {return a.from.first_name > b.from.first_name});
+          resultArr.sort((a, b) => {return a.from.first_name.trim().toLowerCase() > b.from.first_name.trim().toLowerCase()});
           resultArr.map(user => {
               resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.from.first_name)} ${user.from.last_name ? capitalizeFirstLetter(user.from.last_name) : ''}\n`;
               count = count + 1;
@@ -37,7 +37,7 @@ exports.searches = {
     getRespStr: function(resultArr) {
         let resultStr = 'Here are friends near you:\n';
         let count = 1;
-        resultArr.sort((a, b) => {return a.from.first_name > b.from.first_name});
+        resultArr.sort((a, b) => {return a.from.first_name.trim().toLowerCase() > b.from.first_name.trim().toLowerCase()});
         resultArr.map(user => {
             resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.from.first_name)} ${user.from.last_name ? capitalizeFirstLetter(user.from.last_name) : ''}\n`;
             count = count + 1;
