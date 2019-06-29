@@ -11,7 +11,7 @@ exports.searches = {
           let requiredArr = resultArr.map(user => {return user.from});
           requiredArr.sort((a, b) => {return a.first_name.trim().toLowerCase() > b.first_name.trim().toLowerCase()});
           requiredArr.map(user => {
-              resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}\n`;
+              resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}${user.username ? ' (@'+ user.username+')': ''}\n`;
               count = count + 1;
           });
           return resultStr;
@@ -41,7 +41,7 @@ exports.searches = {
         let requiredArr = resultArr.map(user => {return user.from});
         requiredArr.sort((a, b) => {return a.first_name.trim().toLowerCase() > b.first_name.trim().toLowerCase()});
         requiredArr.map(user => {
-            resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}\n`;
+            resultStr += `${count.toString()}. ${capitalizeFirstLetter(user.first_name)} ${user.last_name ? capitalizeFirstLetter(user.last_name) : ''}${user.username ? ' (@'+ user.username+')': ''}\n`;
             count = count + 1;
         });
         return resultStr;
