@@ -3,7 +3,7 @@ exports.searches = {
       filter: function(user, params) {
           let batch = user.batch
           , userId = user.from && user.from.id;
-          return {'batch': batch, 'from.id': {'$ne': userId}}
+          return {'batch': params.length > 1 ? params[1].toString() : batch, 'from.id': {'$ne': userId}}
       },
       getRespStr: function(resultArr) {
           let resultStr = 'Here are your batch mates: \n';

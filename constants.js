@@ -66,7 +66,7 @@ exports.helpMessage = 'Hi! I am @' + config.get('botName')
 + " and then in the NIT KKR alumni group ask me to introduce you."
 + "\n\nBot Development credits: Saumye Malhotra (@algoro) and Devender Yadav (@itsmedev)"
 + "\n\nList of commands:"
-+ "\n/mybatchmates - gives a list of your batchmates - Developer credits: Narendra Kumawat (@nk_kumawat)"
++ "\n/mybatchmates [another batch]- gives a list of your batchmates - Developer credits: Narendra Kumawat (@nk_kumawat)"
 + "\n/nearme [number of kms] - gives a list of your friends near you - Developer credits: Saumye Malhotra (@algoro)"
 
 exports.startPublicMessage = "Please introduce yourself on a private chat with me, click @" + config.get('botName')
