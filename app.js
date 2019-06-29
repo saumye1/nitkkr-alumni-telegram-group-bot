@@ -4,6 +4,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 var constants   = require('./constants');
 var utility     = require('./utility');
+var search      = require('./search').searches;
 
 var bot = new Telegraf(config.get("botToken"));
 
@@ -69,38 +70,39 @@ bot.on("text", (ctx) => {
         //ask next question from unanswered set
         if (messageRecieved.chat.type == "private") {
             //reply only if private chat
-            if(textMsg.toLowerCase().search('mybatchmates') >= 0) {
-                //get my batchmates
-                dbo.collection(config.get("mongoCollections.users")).findOne({"from.id" : fromId}, function(error, user) {
-                    var reply = "Here are your batchmates : \n";
-                    dbo.collection(config.get("mongoCollections.users")).find({"batch" : user.batch}).forEach(function(batchmate) {
-                        reply += capitalizeFirstLetter(batchmate.from.first_name.toLowerCase()) ;
-                        if( batchmate.from.last_name) {
-                            reply += " " + capitalizeFirstLetter(batchmate.from.last_name.toLowerCase());
-                        }
-                        reply += "\n";
-                        }, function(latNull) {
-                            utility.sendMessage(ctx, reply, "search", "private");
-                    })
-                })
-            } else {
-                dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
-                    var questionId = user.last_asked;
+            dbo.collection(config.get("mongoCollections.users")).findOne({"from.id" : fromId}, function(error, user) {
+                if (user.last_asked > constants.questions.length) {
+                    let privCmd = textMsg.split(' ')[0].toLowerCase();
+                    let params = textMsg.split(' ');
+                    if (search.hasOwnProperty(privCmd)) {
+                        dbo.collection(config.get("mongoCollections.users")).find(search[privCmd].filter(user, params)).toArray((err, batchmates)=>{
+                            if (err || !batchmates || !batchmates.length) {
+                                return utility.sendMessage(ctx, constants.emptyResultResponse, 'emptyResponse', 'private');
+                            }
+                            return utility.sendMessageToChatById(bot,user.from && user.from.id, search[privCmd].getRespStr(batchmates));
+                        })
+                    } else {
+                        return utility.sendMessageToChatById(bot, user.from && user.from.id, constants.invalidCommand);
+                    }
+                } else {
+                    dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
+                        var questionId = user.last_asked;
 
-                    //when this answer is to last question, redirect to alumni group and ask to introduce
-                    updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
-                        if (error) {
-                            return utility.sendMessage(ctx, constants.formatErrorMessage, "invalidFormat", "private");
-                        }
-                        if (!result.nextQuestion) {
-                            utility.sendMessage(ctx, constants.introCompleteMessage, "introComplete", "private");
-                        } else {
-                            var nextQuestion = result.nextQuestion;
-                            utility.sendMessage(ctx, nextQuestion, "nextQuestion", "private");
-                        }
-                    });
-                })
-            }
+                        //when this answer is to last question, redirect to alumni group and ask to introduce
+                        updateAnswerToQuestionForUser(user, questionId, textMsg, function(error, result) {
+                            if (error) {
+                                return utility.sendMessage(ctx, constants.formatErrorMessage, "invalidFormat", "private");
+                            }
+                            if (!result.nextQuestion) {
+                                utility.sendMessage(ctx, constants.introCompleteMessage, "introComplete", "private");
+                            } else {
+                                var nextQuestion = result.nextQuestion;
+                                utility.sendMessage(ctx, nextQuestion, "nextQuestion", "private");
+                            }
+                        });
+                    })
+                }
+            });
         } else if (textMsg.search('@' + config.get('botName')) >= 0) {
             dbo.collection(config.get('mongoCollections.users')).findOne({"from.id" : fromId}, function(error, user) {
                 if ( (textMsg.toLowerCase().search('introduceme') >= 0 || textMsg.toLowerCase().search('introduce me') >= 0) && user
@@ -109,7 +111,7 @@ bot.on("text", (ctx) => {
                     + (user.from.last_name ? user.from.last_name : "") + "\n";
                     constants.questions.map(question => {
                         reply += capitalizeFirstLetter(question.answer_key) + " - " + user[question.answer_key] + "\n";
-                    })
+                    });
                     utility.sendMessage(ctx, reply, "introductory", "group");
                 } else if (user && user.last_asked == constants.questions.length + 1) {
                     var mess = "Dear " + from.first_name
@@ -123,7 +125,7 @@ bot.on("text", (ctx) => {
             })
         }
     }
-})
+});
 
 bot.on('location', ctx => {
     let message = ctx.update.message;
@@ -136,9 +138,9 @@ bot.on('location', ctx => {
             coordinates: [lng, lat],
             type: 'Point'
         };
-        dbo.collection(config.get("mongoCollections.users")).findOne({'from.id': fromId}, function(err, user) {
-            if (user.locContext == 'home') {
-                dbo.collection(config.get("mongoCollections.users")).update({"from.id" : fromId}, {'$set' : {'homeLoc': location} },function(error, user) {});
+        dbo.collection(config.get("mongoCollections.users")).findOne({'from.id': fromId, 'homeLoc': {$exists: false}}, function(err, user) {
+            if (user && user.locContext == 'home') {
+                dbo.collection(config.get("mongoCollections.users")).update({"from.id" : fromId}, {'$set' : {'homeLoc': location, homeLocUpdatedAt: new Date()} },function(error, user) {});
             }
         });
     }
@@ -152,7 +154,7 @@ function startInitialProcess() {
       if (!err) {
         console.log("Database initialized");
         db = database;
-        dbo = db.db(config.get("databaseSettings.name"))
+        dbo = db.db(config.get("databaseSettings.name"));
         setInterval(function () {
             utility.deleteUnnecessaryMessages(bot);
         }, config.get("messageDeleteHeartBeatRate"));

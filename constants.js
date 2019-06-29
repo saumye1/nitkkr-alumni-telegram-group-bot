@@ -77,3 +77,7 @@ exports.introCompleteMessage = "It's pleasure to know you!\n\nPlease type /intro
 + config.get('botName') + " in the NIT Kurkshetra Alumni group.";
 
 exports.locationCollectionMessage = 'Please send your location (as an attachment, by first clicking the attachment sign below). Note: Your location will only be used to find your college friends near you and to better organize events in future.';
+
+exports.emptyResultResponse = `We couldn't find anything on your search criteria. Please invite your friends to join the group.`;
+
+exports.invalidCommand = `Sorry, I am unable to recognize this command.`;
