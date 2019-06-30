@@ -6,7 +6,7 @@ exports.searches = {
           return {'batch': params.length > 1 ? params[1].toString() : batch, 'from.id': {'$ne': userId}}
       },
       getRespStr: function(resultArr, params=[]) {
-          let resultStr = params.length > 1 ? ` Here are friends from ${params[1].toString()}:` : 'Here are your batch mates: \n';
+          let resultStr = params.length > 1 ? ` Here are friends from ${params[1].toString()}: \n` : 'Here are your batch mates: \n';
           let count = 1;
           let requiredArr = resultArr.map(user => {return user.from});
           requiredArr.sort((a, b) => {return a.first_name.trim().toLowerCase() > b.first_name.trim().toLowerCase()});
@@ -36,7 +36,7 @@ exports.searches = {
         }};
     },
     getRespStr: function(resultArr, params=[]) {
-        let resultStr = `Here are friends near you${' (' + params.length > 1 ? 'in ' + params[1].toString() + ' Kms radius)' : 'in 10 Kms radius)'}:\n`;
+        let resultStr = `Here are friends near you${' (' + (params.length > 1 ? 'in ' + params[1].toString() + ' Kms radius)' : 'in 10 Kms radius)')}:\n`;
         let count = 1;
         let requiredArr = resultArr.map(user => {return user.from});
         requiredArr.sort((a, b) => {return a.first_name.trim().toLowerCase() > b.first_name.trim().toLowerCase()});
