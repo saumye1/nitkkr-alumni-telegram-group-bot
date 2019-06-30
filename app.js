@@ -71,7 +71,7 @@ bot.on("text", (ctx) => {
         if (messageRecieved.chat.type == "private") {
             //reply only if private chat
             dbo.collection(config.get("mongoCollections.users")).findOne({"from.id" : fromId}, function(error, user) {
-                if (user.last_asked > constants.questions.length) {
+                if (user.last_asked > user.questions.length) {
                     let privCmd = textMsg.split(' ')[0].toLowerCase().split('/').join('');
                     let params = textMsg.split(' ');
                     if (search.hasOwnProperty(privCmd)) {
