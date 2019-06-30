@@ -138,7 +138,7 @@ bot.on('location', ctx => {
             coordinates: [lng, lat],
             type: 'Point'
         };
-        console.log(`Some body sent their location : ${JSON.stringify(location)}`);
+        console.log(`${message.from} sent their location : ${JSON.stringify(location)}`);
         dbo.collection(config.get("mongoCollections.users")).findOne({'from.id': fromId, 'homeLoc': {$exists: false}}, function(err, user) {
             if (user && user.locContext == 'home') {
                 dbo.collection(config.get("mongoCollections.users")).update({"from.id" : fromId}, {'$set' : {'homeLoc': location, homeLocUpdatedAt: new Date()} },function(error, user) {});
