@@ -77,9 +77,9 @@ bot.on("text", (ctx) => {
                     if (search.hasOwnProperty(privCmd)) {
                         dbo.collection(config.get("mongoCollections.users")).find(search[privCmd].filter(user, params)).toArray((err, batchmates)=>{
                             if (err || !batchmates || !batchmates.length) {
-                                return utility.sendMessage(ctx, constants.emptyResultResponse, 'emptyResponse', 'private');
+                                return utility.sendMessage(ctx, constants.emptyResultResponse + (!user.homeLoc ? ' ' + constants.sendLocationMsg : ''), 'emptyResponse', 'private');
                             }
-                            return utility.sendMessageToChatById(bot,user.from && user.from.id, search[privCmd].getRespStr(batchmates));
+                            return utility.sendMessageToChatById(bot,user.from && user.from.id, search[privCmd].getRespStr(batchmates, params));
                         })
                     } else {
                         return utility.sendMessageToChatById(bot, user.from && user.from.id, constants.invalidCommand);
@@ -138,9 +138,13 @@ bot.on('location', ctx => {
             coordinates: [lng, lat],
             type: 'Point'
         };
+        console.log(`Some body sent their location : ${JSON.stringify(location)}`);
         dbo.collection(config.get("mongoCollections.users")).findOne({'from.id': fromId, 'homeLoc': {$exists: false}}, function(err, user) {
             if (user && user.locContext == 'home') {
                 dbo.collection(config.get("mongoCollections.users")).update({"from.id" : fromId}, {'$set' : {'homeLoc': location, homeLocUpdatedAt: new Date()} },function(error, user) {});
+                utility.sendMessageToChatById(bot, fromId, constants.locationUpdatedMessage);
+            } else {
+                utility.sendMessageToChatById(bot, fromId, constants.locationAlreadyExists);
             }
         });
     }
